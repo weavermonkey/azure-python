@@ -1,1 +1,46 @@
+tenant_id = ''
+client_id = ''
+key = ''
+storage_account_name = ''
+table_key = ''
+resource_group_name = ''
+vm_ss_name = ''
+location_name = ''
+ip_config_name = ''
 
+def create_public_ip( network_client, public_ip_name):
+    public_ip_address_params = {
+        'location':'centralindia',
+        'public_ip_allocation_method':'Dynamic'
+    }
+    creation_result = network_client.public_ip_addresses.create_or_update(
+        'DEV-Central',
+        public_ip_name,
+        public_ip_address_params
+    )
+
+def create_nic( nic_name ):
+def create_nic( nic_name ):
+    credentials_dict = authenticate( client_id, key, tenant_id )
+    network_client = NetworkManagementClient( credentials_dict['credentials'], credentials_dict['subscription_id'] )
+    create_public_ip( network_client, nic_name )
+    public_ip_address = network_client.public_ip_addresses.get( 'DEV-Central', nic_name )
+    created_nic = network_client.network_interfaces.create_or_update(
+        resource_group_name,
+        nic_name,
+        {
+            'location' : location_name,
+            'ip_configurations' :
+            [
+                {
+                    'name' : ip_config_name,
+                    'public_ip_address':public_ip_address,
+                    'subnet':
+                    {
+                        'id': 'subscriptions/323d5267-a4fa-40de-9a3b-2e5ef1baf16d/resourcegroups/DEV-Central/providers/Microsoft.Network/virtualNetworks/DEV-Central-vnet/subnets/default'
+                    }
+                }
+            ]
+        }
+    )
+    return created_nic.result().id  
